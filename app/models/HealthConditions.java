@@ -6,15 +6,17 @@ public class HealthConditions
 {
     private String name;
     private String summary;
+    private String uRL;
 
     public HealthConditions(String name)
     {
         this.name = name;
     }
-    public HealthConditions(String name, String summary)
+    public HealthConditions(String name, String summary, String uRL)
     {
         this.name = name;
         this.summary = summary;
+        this.uRL = uRL;
     }
     public String getName()
     {
@@ -23,5 +25,9 @@ public class HealthConditions
     public  String getSummary()
     {
         return summary;
+    }
+    public String getuRL()
+    {
+        return uRL;
     }
 }

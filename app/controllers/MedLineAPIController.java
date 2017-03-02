@@ -21,7 +21,7 @@ import javax.inject.Inject;
 
 public class MedLineAPIController extends Controller
 {
-
+    //left these in because will need when hooking up the database and making queries
     private final FormFactory formFactory;
     private final JPAApi jpaApi;
 
@@ -34,11 +34,15 @@ public class MedLineAPIController extends Controller
 
     public Result MedLineAPI()
     {
+        //hard coded in the health conditions, will be pulling list of health conditions from database in DAC
         List<HealthConditions> fullSummery = new ArrayList<>();
         List<HealthConditions> healthConditions = new ArrayList<>();
         healthConditions.add(new HealthConditions("Asthma"));
         healthConditions.add(new HealthConditions("Diabetes"));
         healthConditions.add(new HealthConditions("Depression"));
+        healthConditions.add(new HealthConditions("Anxiety"));
+        healthConditions.add(new HealthConditions("Hypertension"));
+        healthConditions.add(new HealthConditions("Obesity"));
 
         for(HealthConditions conditionList: healthConditions) {
 
@@ -46,13 +50,14 @@ public class MedLineAPIController extends Controller
             int indexPosition = 1;
             Document doc = null;
             try {
+                //loops though, making a new API call for every health condition
                 String myURL = "https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=" + conditionList.getName();
 
                 URL url = new URL(myURL);
 
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
                 request.connect();
-
+                //This contains all the xml info from the API
                 doc = play.libs.XML.fromInputStream(request.getInputStream(), null);
 
                 while (!doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary"))
@@ -66,20 +71,16 @@ public class MedLineAPIController extends Controller
                         break;
                     }
                 }
-                //added these in to keep up with the indexPosition and used to test comparison while working out function
-                //will remove before adding to DAC
-                System.out.println("API function Doc Stuff: " + doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent());
-                System.out.println("API indexPosition: " + indexPosition);
-                if (doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary")) {
-                    System.out.println("Equal!!!!");
-                }
+
             } catch (Exception e) {
                 Logger.error("oh no! got some exception: " + e.getMessage());
             }
-            HealthConditions summary = new HealthConditions(conditionList.getName(), doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent());
+
+            String fullSummaryString = doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent();
+            String readMoreURL = doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getAttributes().getNamedItem("url").getTextContent();
+            HealthConditions summary = new HealthConditions(conditionList.getName(), fullSummaryString, readMoreURL);
             fullSummery.add(summary);
         }
-
         return ok(views.html.medLine.render(fullSummery));
     }
 }

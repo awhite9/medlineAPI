@@ -10,9 +10,11 @@
 @for(docs <- doc){
 
 <fieldset>
-    <legend>@docs.getName() Detail</legend>
+    <legend>@docs.getName() Details</legend>
     <div>
 @Html(docs.getSummary)
+        <br>
+        <a href="@docs.getuRL" target="_blank">(Read More)</a>
     </div>
 </fieldset>
 <br>
