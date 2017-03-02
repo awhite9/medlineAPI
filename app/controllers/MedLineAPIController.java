@@ -1,9 +1,7 @@
 package controllers;
 
+import models.HealthConditions;
 import org.w3c.dom.Document;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -12,6 +10,7 @@ import play.mvc.Result;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 
 import play.data.FormFactory;
@@ -35,41 +34,47 @@ public class MedLineAPIController extends Controller
 
     public Result MedLineAPI()
     {
+        List<String> fullSummery = new ArrayList<>();
+        List<HealthConditions> healthConditions = new ArrayList<>();
+        healthConditions.add(new HealthConditions("asthma"));
+        healthConditions.add(new HealthConditions("diabetes"));
+        healthConditions.add(new HealthConditions("depression"));
 
-        int indexPosition = 1;
-        Document doc = null;
-        try
-        {
-            String myURL = "https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=creutzfeldtjakobdisease";
+        for(HealthConditions conditionList: healthConditions) {
 
-            URL url = new URL(myURL);
 
-            HttpURLConnection request = (HttpURLConnection) url.openConnection();
-            request.connect();
+            int indexPosition = 1;
+            Document doc = null;
+            try {
+                String myURL = "https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=" + conditionList.getName();
 
-            doc = play.libs.XML.fromInputStream(request.getInputStream(), null);
+                URL url = new URL(myURL);
 
-            while (!doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary"))
-            {
-                indexPosition+=2;
-                if(indexPosition>30)
-                {
-                    indexPosition=1;
-                    break;
+                HttpURLConnection request = (HttpURLConnection) url.openConnection();
+                request.connect();
+
+                doc = play.libs.XML.fromInputStream(request.getInputStream(), null);
+
+                while (!doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary")) {
+                    indexPosition += 2;
+                    if (indexPosition > 30) {
+                        indexPosition = 1;
+                        break;
+                    }
                 }
+                //added these in to keep up with the index positions
+                System.out.println("API function Doc Stuff: " + doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent());
+                System.out.println("API indexPosition: " + indexPosition);
+                if (doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary")) {
+                    System.out.println("Equal!!!!");
+                }
+            } catch (Exception e) {
+                Logger.error("oh no! got some exception: " + e.getMessage());
             }
-            //added these in to keep up with the index positions
-            System.out.println("API function Doc Stuff: "+doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent());
-            System.out.println("API indexPosition: "+indexPosition);
-            if(doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary"))
-            {
-                System.out.println("Equal!!!!");
-            }
-        } catch (Exception e)
-        {
-            Logger.error("oh no! got some exception: " + e.getMessage());
+            fullSummery.add(doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent());
         }
-        return ok(views.html.medLine.render(doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent()));
+
+        return ok(views.html.medLine.render(fullSummery));
     }
 }
 

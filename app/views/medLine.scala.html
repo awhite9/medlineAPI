@@ -1,4 +1,4 @@
-@(doc : String )
+@(doc : List[String] )
 
 <!DOCTYPE html>
 <html>
@@ -6,8 +6,14 @@
 </head>
 <body>
 <h1>MedLine API</h1>
+@for(docs <- doc){
 
-@Html(doc)
+<fieldset>
+    <legend>Health Condition Detail</legend>
+@Html(docs)
+</fieldset>
+<br>
+}
 
 
 
