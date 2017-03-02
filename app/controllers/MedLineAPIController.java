@@ -34,11 +34,11 @@ public class MedLineAPIController extends Controller
 
     public Result MedLineAPI()
     {
-        List<String> fullSummery = new ArrayList<>();
+        List<HealthConditions> fullSummery = new ArrayList<>();
         List<HealthConditions> healthConditions = new ArrayList<>();
-        healthConditions.add(new HealthConditions("asthma"));
-        healthConditions.add(new HealthConditions("diabetes"));
-        healthConditions.add(new HealthConditions("depression"));
+        healthConditions.add(new HealthConditions("Asthma"));
+        healthConditions.add(new HealthConditions("Diabetes"));
+        healthConditions.add(new HealthConditions("Depression"));
 
         for(HealthConditions conditionList: healthConditions) {
 
@@ -76,8 +76,8 @@ public class MedLineAPIController extends Controller
             } catch (Exception e) {
                 Logger.error("oh no! got some exception: " + e.getMessage());
             }
-            //creates an arrayList of FullSummary strings that you can step though in the HTML
-            fullSummery.add(doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent());
+            HealthConditions summary = new HealthConditions(conditionList.getName(), doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent());
+            fullSummery.add(summary);
         }
 
         return ok(views.html.medLine.render(fullSummery));

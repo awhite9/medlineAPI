@@ -1,0 +1,27 @@
+
+div{
+        margin: 10px;
+        padding-bottom: 10px;
+        }
+        .title{
+        float: left;
+        width: 100px;
+        text-align: right;
+        padding-right: 10px;
+        font-family:Comic Sans MS;}
+
+        fieldset {
+
+        border: 1px solid Black;
+        border-radius: 10px;
+        padding: 20px
+        text-align: right;
+        font-family:Comic Sans MS;}
+
+        legend{
+        background-color: #efefef;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 10px 20px;
+        text-align left;
+        font-family:Comic Sans MS;}
