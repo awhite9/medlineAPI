@@ -55,14 +55,19 @@ public class MedLineAPIController extends Controller
 
                 doc = play.libs.XML.fromInputStream(request.getInputStream(), null);
 
-                while (!doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary")) {
+                while (!doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary"))
+                {
+                    //with MedLine even numbered nodes are null - so increment by 2 to avoid null pointer exception
                     indexPosition += 2;
-                    if (indexPosition > 30) {
+                    if (indexPosition > doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().getLength())
+                    {
+                        //if none of the nodes in the content node have the name "FullSummary", break the while loop and set indexPosition to 1, avoiding blowup
                         indexPosition = 1;
                         break;
                     }
                 }
-                //added these in to keep up with the index positions
+                //added these in to keep up with the indexPosition and used to test comparison while working out function
+                //will remove before adding to DAC
                 System.out.println("API function Doc Stuff: " + doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent());
                 System.out.println("API indexPosition: " + indexPosition);
                 if (doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getAttributes().getNamedItem("name").getFirstChild().getTextContent().contentEquals("FullSummary")) {
@@ -71,6 +76,7 @@ public class MedLineAPIController extends Controller
             } catch (Exception e) {
                 Logger.error("oh no! got some exception: " + e.getMessage());
             }
+            //creates an arrayList of FullSummary strings that you can step though in the HTML
             fullSummery.add(doc.getFirstChild().getChildNodes().item(13).getChildNodes().item(1).getChildNodes().item(indexPosition).getTextContent());
         }
 
