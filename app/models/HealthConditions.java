@@ -8,10 +8,7 @@ public class HealthConditions
     private String summary;
     private String uRL;
 
-    public HealthConditions(String name)
-    {
-        this.name = name;
-    }
+
     public HealthConditions(String name, String summary, String uRL)
     {
         this.name = name;

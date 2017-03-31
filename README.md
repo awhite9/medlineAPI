@@ -1,3 +1,4 @@
-# Play Java Product with JPA
+# Medline API returning XML
 
-This project demonstrate how to create a simple CRUD application with Play, using JPA.
+This project makes SQL call to DB to get list of medical conditions. Then makes API call to Medline Plus
+to return XML. it is then parsed to return only "fullSummary".
